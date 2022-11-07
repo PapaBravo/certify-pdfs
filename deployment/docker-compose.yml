@@ -18,9 +18,11 @@ services:
     depends_on:
       - redis
   redis:
-    image: "redis:7-alpine"
-    command: redis-server /usr/local/etc/redis/redis.conf --requirepass sOmE_sEcUrE_pAsS
+    image: "redis/redis-stack:6.2.4-v3"
     ports: 
       - "6379:6379"
+      - "8001:8001"
+    environment:
+      - REDIS_ARGS=--requirepass sOmE_sEcUrE_pAsS
     volumes:
-      - ./redis-conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-conf/redis.conf:/redis-stack.conf

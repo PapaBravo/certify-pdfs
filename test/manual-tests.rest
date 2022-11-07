@@ -1,0 +1,9 @@
+# Test sign call
+
+POST http://localhost:8080/sign HTTP/1.1
+content-type: application/json
+
+{
+    "claim": "{\"firstName\": \"First\", \"lastName\": \"Last\"}",
+    "documentKey": "ticket"
+}

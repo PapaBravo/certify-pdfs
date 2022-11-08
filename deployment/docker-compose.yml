@@ -10,11 +10,22 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - redis
-  certify-renderer:
+  certify-renderer-1:
     image: paul/certify-renderer
     build: 
       context: ../renderer
       dockerfile: Dockerfile
+    environment:
+      - SERVICE_ID=1
+    depends_on:
+      - redis
+  certify-renderer-2:
+    image: paul/certify-renderer
+    build: 
+      context: ../renderer
+      dockerfile: Dockerfile
+    environment:
+      - SERVICE_ID=2
     depends_on:
       - redis
   redis:

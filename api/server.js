@@ -50,7 +50,7 @@ app.post('/sign', async (req, res) => {
       .json.set(`jobs:${jobID}`, '$', jobData, { NX: true })
       .LPUSH('queue', jobID)
       .exec();
-    console.log('Written', jobID, jobData);
+    console.log('Written', jobID);
 
     res.status(200);
     res.send(jobID);

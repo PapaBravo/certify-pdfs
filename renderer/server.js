@@ -1,6 +1,7 @@
 'use strict';
 
 const { createClient } = require('redis');
+const process = require('process');
 
 const redisConfig = {
     username: 'default',
@@ -11,29 +12,41 @@ const redisConfig = {
     }
 }
 
+function log(message, level) {
+
+    const result = `${new Date().toISOString()} - ${`Service` + process.env.SERVICE_ID} - ${message}`;
+
+    if (level === 'error') {
+        console.error(result)
+    } else {
+        console.log(result);
+    }
+}
+
 const redis = createClient(redisConfig);
 
 async function getNextJob() {
-    console.log('Waiting for next job');
+    log('Waiting for next job');
     const { element: jobID } = await redis.BRPOP('queue', 0);
-    console.log('Found job id', jobID);
+    log('Found job id ' + jobID);
 
     const jobKey = `jobs:${jobID}`;
 
     const jobDetails = await redis.json.get(jobKey, '$');
-    console.log('Received job details', jobDetails);
+    log('Received job details');
 
     await redis.json.set(jobKey, '$.status', "RENDERING");
 
     //TODO: render document here
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    return getNextJob();
+    getNextJob();
 }
 
 async function main() {
     try {
         await redis.connect();
-        console.log('renderer connected to redis');
+        log('renderer connected to redis');
 
         // await redis.subscribe('__keyevent@0__:set', (message, channel) => {
         //     console.log('renderer', channel, message);

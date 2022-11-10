@@ -1,6 +1,7 @@
 'use strict';
 
 const { createClient } = require('redis');
+const Minio = require('minio');
 const process = require('process');
 
 const redisConfig = {
@@ -11,6 +12,14 @@ const redisConfig = {
         port: '6379'
     }
 }
+
+const minioClient = new Minio.Client({
+    endPoint: 'minio',
+    port: 9000,
+    useSSL: false,
+    accessKey: 'minioadmin',
+    secretKey: 'minioadmin'
+})
 
 function log(message, level) {
 
@@ -39,6 +48,11 @@ async function getNextJob() {
 
     //TODO: render document here
     await new Promise((resolve) => setTimeout(resolve, 5000));
+    minioClient.putObject('results', jobID, JSON.stringify(jobDetails), (err) => {
+        if (err) {
+            console.error('Could not put object', err);
+        }
+    });
 
     getNextJob();
 }

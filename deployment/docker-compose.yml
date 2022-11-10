@@ -9,7 +9,8 @@ services:
       context: ../api
       dockerfile: Dockerfile
     depends_on:
-      - redis
+      - certify-renderer-1
+      - certify-renderer-2
   certify-renderer-1:
     image: paul/certify-renderer
     build: 
@@ -19,6 +20,7 @@ services:
       - SERVICE_ID=1
     depends_on:
       - redis
+      - createbuckets
   certify-renderer-2:
     image: paul/certify-renderer
     build: 
@@ -28,6 +30,7 @@ services:
       - SERVICE_ID=2
     depends_on:
       - redis
+      - createbuckets
   redis:
     image: "redis/redis-stack:6.2.4-v3"
     ports: 
@@ -37,3 +40,28 @@ services:
       - REDIS_ARGS=--requirepass sOmE_sEcUrE_pAsS
     volumes:
       - ./redis-conf/redis.conf:/redis-stack.conf
+  minio:
+    image: minio/minio:RELEASE.2022-11-08T05-27-07Z
+    command: server --console-address ":9001" /data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/results;
+      /usr/bin/mc policy download myminio/results;
+      exit 0;
+      "

@@ -1,1 +1,1 @@
-docker-compose -f ./deployment/docker-compose.yml up --build
+docker-compose -f ./deployment/docker-compose.yml up --build --force-recreate --remove-orphans --renew-anon-volumes

@@ -1,9 +1,9 @@
 const { ObjectStorage } = require('./objectStorage');
 const { KeyValueStore } = require('./keyValueStore');
-
+const { renderDocument } = require('./documentHandler');
 
 async function getNextJob() {
-    
+
     console.log('Waiting for next job');
     const keyStore = await KeyValueStore.getInstance();
     const objectStore = await ObjectStorage.getInstance();
@@ -13,15 +13,16 @@ async function getNextJob() {
 
     const jobKey = `jobs:${jobID}`;
 
-    const jobDetails = keyStore.getJSON(jobKey, '$');
+    const jobDetails = await keyStore.getJSON(jobKey, '$');
     console.log('Received job details');
 
     await keyStore.setJSON(jobKey, '$.status', "RENDERING");
 
-    //TODO: render document here
-    await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    await objectStore.putObject('results', jobID, JSON.stringify(jobDetails));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    //TODO: Add template download here
+    let document = await renderDocument('Hello, {{claim.firstName}}!', JSON.parse(jobDetails.claim));
+    await objectStore.putObject('results', jobID, document);
 
     getNextJob();
 }

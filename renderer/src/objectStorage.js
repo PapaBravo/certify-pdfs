@@ -20,16 +20,16 @@ class ObjectStorage {
      * 
      * @param {String} bucket 
      * @param {String} key 
-     * @param {String | Buffer} buffer 
+     * @param {String | Buffer | ReadableStream} buffer 
      * @returns {Promise}
      */
     async putObject(bucket, key, buffer) {
         return new Promise(function (resolve, reject) {
-            minio.putObject(bucket, key, buffer, function (err) {
+            minio.putObject(bucket, key, buffer, function (err, objInfo) {
                 if (err) {
                     console.error('Could not put object', err);
                     reject(err);
-                } else resolve();
+                } else resolve(objInfo);
             })
         });
     }

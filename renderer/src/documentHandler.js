@@ -1,7 +1,7 @@
 const QRCode = require('qrcode');
 const Handlebars = require("handlebars");
 const wkhtmltopdf = require('wkhtmltopdf');
-const { randomUUID } = require('crypto');
+const toArray = require('stream-to-array');
 
 async function generateQR(data) {
     const qr = await QRCode.toDataURL(data);
@@ -29,17 +29,33 @@ function renderTemplate(template, input) {
 }
 
 async function renderPDF(html) {
-    let uuid = randomUUID();
-    let destination = `public/files/${uuid}.pdf`;
-    let stream = wkhtmltopdf(html, { output: destination });
-    return new Promise((resolve, reject) => {
-        stream.on('end', () => resolve(`/files/${uuid}.pdf`));
-    });
+    const options = {};
+
+    let stream = wkhtmltopdf(html, options);
+    let parts = await toArray(stream);
+    let buffers = [];
+    for (let i = 0, l = parts.length; i < l; ++i) {
+        let part = parts[i]
+        buffers.push((part instanceof Buffer) ? part : Buffer.from(part))
+    }
+    return Buffer.concat(buffers)
+}
+
+
+/**
+ * 
+ * @param {string} template An html template to be rendered by Handlebars 
+ * @param {any} claim
+ * @returns {Promise<Buffer>}
+ */
+async function renderDocument(template, claim) {
+    // sign claim
+    let signature = '<signature>'; //TODO: add signing here
+    let input = await makeInput(template, claim, signature, 'localhost:3000/verify/');
+    let html = renderTemplate(template, input);
+    return renderPDF(html);
 }
 
 module.exports = {
-    generateQR,
-    makeInput,
-    renderTemplate,
-    renderPDF
+    renderDocument
 }

@@ -1,4 +1,5 @@
 const Minio = require('minio');
+const { streamToBuffer } = require('./utils');
 
 const minio = new Minio.Client({
     endPoint: 'minio',
@@ -21,17 +22,22 @@ class ObjectStorage {
      * @param {String} bucket 
      * @param {String} key 
      * @param {String | Buffer | ReadableStream} buffer 
-     * @returns {Promise}
+     * @returns {Promise<Object>} with information about the object
      */
     async putObject(bucket, key, buffer) {
-        return new Promise(function (resolve, reject) {
-            minio.putObject(bucket, key, buffer, function (err, objInfo) {
-                if (err) {
-                    console.error('Could not put object', err);
-                    reject(err);
-                } else resolve(objInfo);
-            })
-        });
+        let objInfo = await minio.putObject(bucket, key, buffer);
+        return objInfo;
+    }
+
+    /**
+     * 
+     * @param {String} bucket 
+     * @param {String} key 
+     * @returns {Promise<Buffer>}
+     */
+    async getObject(bucket, key) {
+        let stream = await minio.getObject(bucket, key);
+        return streamToBuffer(stream);
     }
 
     static async createAsyncInstance() {
@@ -45,7 +51,7 @@ class ObjectStorage {
 
     static async getInstance() {
         if (ObjectStorage.instance) return ObjectStorage.instance;
-        
+
         ObjectStorage.instance = ObjectStorage.createAsyncInstance();
         return ObjectStorage.instance;
     }

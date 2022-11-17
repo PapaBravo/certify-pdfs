@@ -1,7 +1,7 @@
 const QRCode = require('qrcode');
 const Handlebars = require("handlebars");
 const wkhtmltopdf = require('wkhtmltopdf');
-const toArray = require('stream-to-array');
+const { streamToBuffer } = require('./utils');
 
 async function generateQR(data) {
     const qr = await QRCode.toDataURL(data);
@@ -32,13 +32,7 @@ async function renderPDF(html) {
     const options = {};
 
     let stream = wkhtmltopdf(html, options);
-    let parts = await toArray(stream);
-    let buffers = [];
-    for (let i = 0, l = parts.length; i < l; ++i) {
-        let part = parts[i]
-        buffers.push((part instanceof Buffer) ? part : Buffer.from(part))
-    }
-    return Buffer.concat(buffers)
+    return await streamToBuffer(stream);
 }
 
 

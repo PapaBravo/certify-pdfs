@@ -10,7 +10,7 @@ async function handleJob(jobID) {
     const jobDetails = await keyStore.getJSON(jobKey, '$');
     console.log('Received job details for ' + jobID);
     await keyStore.setJSON(jobKey, '$.status', "RENDERING");
-    let template = await objectStore.getObject('templates', 'simple.html');
+    let template = await objectStore.getObject('templates', jobDetails.documentKey);
     template = template.toString('utf8');
     let document = await renderDocument(template, JSON.parse(jobDetails.claim));
     const objInfo = await objectStore.putObject('results', jobID, document);

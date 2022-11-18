@@ -65,6 +65,6 @@ services:
       /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
       /usr/bin/mc mb myminio/results;
       /usr/bin/mc mb myminio/templates;
-      /usr/bin/mc od if=/template.html of=myminio/templates/simple.html;
+      /usr/bin/mc od if=/template.html of=myminio/templates/ticket;
       exit 0;
       "

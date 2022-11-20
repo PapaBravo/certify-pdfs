@@ -17,14 +17,13 @@ async function handleJob(jobID) {
     console.log('wrote job result to store', objInfo);
 }
 
-async function getNextJob() {
+function getNextJob() {
     console.log('Waiting for next job');
-    const keyStore = await KeyValueStore.getInstance();
-    const { element: jobID } = await keyStore.pop('queue');
 
-    await handleJob(jobID);
-
-    getNextJob();
+    KeyValueStore.getInstance()
+        .then(keyStore => keyStore.pop('queue'))
+        .then(({ element: jobID }) => handleJob(jobID))
+        .then(getNextJob);
 }
 
 module.exports = {

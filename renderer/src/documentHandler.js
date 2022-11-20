@@ -2,6 +2,7 @@ const QRCode = require('qrcode');
 const Handlebars = require("handlebars");
 const wkhtmltopdf = require('wkhtmltopdf');
 const { streamToBuffer } = require('./utils');
+const { Certifier } = require('./certifier');
 
 async function generateQR(data) {
     const qr = await QRCode.toDataURL(data);
@@ -43,8 +44,8 @@ async function renderPDF(html) {
  * @returns {Promise<Buffer>}
  */
 async function renderDocument(template, claim) {
-    // sign claim
-    let signature = '<signature>'; //TODO: add signing here
+    const certifier = await Certifier.getInstance();
+    let signature = await certifier.sign(JSON.stringify(claim));
     let input = await makeInput(template, claim, signature, 'localhost:3000/verify/');
     let html = renderTemplate(template, input);
     return renderPDF(html);

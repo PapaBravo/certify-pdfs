@@ -18,6 +18,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - SERVICE_ID=1
+    secrets:
+      - SIGN_PRIVATE_KEY
     depends_on:
       - redis
       - createbuckets
@@ -28,6 +30,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - SERVICE_ID=2
+    secrets:
+      - SIGN_PRIVATE_KEY
     depends_on:
       - redis
       - createbuckets
@@ -68,3 +72,6 @@ services:
       /usr/bin/mc od if=/template.html of=myminio/templates/ticket;
       exit 0;
       "
+secrets:
+  SIGN_PRIVATE_KEY:
+    file: ./secrets/ec256-key-pair.pem

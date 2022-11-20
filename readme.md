@@ -12,3 +12,18 @@
 | documentKey | string                          |
 | claim       | string (json)                   |
 | pdfUrl      | string                          |
+
+# Start up
+Using docker-compose, the whole system can be started with 
+
+```sh
+sh ./start.sh
+```
+
+## Before Startup
+### Crypto
+Generate a new key pair with 
+
+```sh
+openssl ecparam -name prime256v1 -genkey -noout -out ./deployment/secrets/ec256-key-pair.pem
+```

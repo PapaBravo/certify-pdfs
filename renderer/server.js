@@ -7,7 +7,7 @@ const { getNextJob } = require('./src/controller');
 async function main() {
     await ObjectStorage.getInstance();
     await KeyValueStore.getInstance();
-    await getNextJob();
+    getNextJob();
 }
 
 main();

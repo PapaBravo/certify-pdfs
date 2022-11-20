@@ -72,6 +72,12 @@ services:
       /usr/bin/mc od if=/template.html of=myminio/templates/ticket;
       exit 0;
       "
+  client:
+    image: nginx:1.23.2-alpine
+    ports:
+      - "8081:80"
+    volumes:
+      - ../client:/usr/share/nginx/html:ro
 secrets:
   SIGN_PRIVATE_KEY:
     file: ./secrets/ec256-key-pair.pem

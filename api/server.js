@@ -2,6 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const { createClient } = require('redis');
 
 const { randomUUID } = require('crypto');
@@ -19,26 +20,22 @@ const redisConfig = {
   }
 }
 
+const corsOptions = {
+  origin: ['http://localhost:8081'],
+}
+
 // Redis connection
 const redis = createClient(redisConfig);
 
 // App
 const app = express();
 
+app.use(cors(corsOptions));
+app.options('*', cors());
+
 app.use(bodyParser.json())
 
-app.get('/', async (req, res) => {
-  try {
-    await redis.set('key', new Date().toISOString());
-    const value = await redis.get('key');
-    res.send(value);
-  } catch (err) {
-    res.status(400);
-    res.send(err.message);
-  }
-});
-
-app.post('/sign', async (req, res) => {
+app.post('/api/v1/sign', async (req, res) => {
   console.log('sign called');
   let { claim, documentKey } = req.body;
   let jobID = randomUUID();

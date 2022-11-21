@@ -70,6 +70,11 @@ app.post('/api/v1/verify', async (req, res) => {
   }
 });
 
+app.get('/api/v1/public-key', async (req, res) => {
+  let key = certifier.getPublicKey();
+  res.status(200).send({key});
+});
+
 async function main() {
   try {
     await redis.connect();

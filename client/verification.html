@@ -7,32 +7,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verification</title>
 
+    <script type="text/javascript" src="vendor/jose.umd.js"></script>
     <script>
-        function renderSuccess(verification) {
-            document.write(`<pre>${JSON.stringify(verification, null, 2)}</pre>`);
-            document.body.style = 'background-color: lightgreen';
+        function renderSuccess(verification, verificationSide) {
+            let el = document.getElementById(`${verificationSide}_side_container`);
+            el.innerHTML = (`<pre>${JSON.stringify(verification, null, 2)}</pre>`);
+            el.style = 'background-color: lightgreen';
         }
 
-        async function verify() {
-            let token = new URL(window.location).searchParams.get('token');
+        async function verifyClientSide(signature) {
+
+            let publicKey = await fetch('http://localhost:8080/api/v1/public-key');
+            publicKey = await publicKey.json();
+            publicKey = await jose.importJWK(publicKey.key, 'ES256')
+
+            let { payload, protectedHeader } = await jose.compactVerify(signature, publicKey);
+            payload = new TextDecoder().decode(payload);
+            renderSuccess(JSON.parse(payload), 'client');
+        }
+
+
+        async function verifyServerSide(signature) {
             let verification = await fetch('http://localhost:8080/api/v1/verify',
                 {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ signature: token })
+                    body: JSON.stringify({ signature })
                 });
             let status = verification.status;
             verification = await verification.json();
 
             if (status == 200) {
-                renderSuccess(verification);
+                renderSuccess(verification, 'server');
             }
         }
-        verify();
+
+        async function verify() {
+            let token = new URL(window.location).searchParams.get('token');
+            verifyServerSide(token);
+            verifyClientSide(token);
+        }
     </script>
+
+    <style>
+        .result_container {
+            width: 100%;
+            max-width: 300px;
+            height: 20%;
+        }
+    </style>
 </head>
 
-<body>
+<body onload="verify()">
+    <section>
+        <h2>Server Side Verification</h2>
+        <div id="server_side_container" class="result_container"></div>
+    </section>
+    <section>
+        <h2>Client Side Verification</h2>
+        <div id="client_side_container" class="result_container"></div>
+    </section>
 </body>
 
 </html>

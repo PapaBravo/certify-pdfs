@@ -4,8 +4,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { createClient } = require('redis');
-
 const { randomUUID } = require('crypto');
+
+const { Certifier } = require('./certifier');
 
 // Constants
 const PORT = 8080;
@@ -26,6 +27,7 @@ const corsOptions = {
 
 // Redis connection
 const redis = createClient(redisConfig);
+let certifier;
 
 // App
 const app = express();
@@ -36,7 +38,6 @@ app.options('*', cors());
 app.use(bodyParser.json())
 
 app.post('/api/v1/sign', async (req, res) => {
-  console.log('sign called');
   let { claim, documentKey } = req.body;
   let jobID = randomUUID();
 
@@ -57,17 +58,30 @@ app.post('/api/v1/sign', async (req, res) => {
   }
 });
 
+app.post('/api/v1/verify', async (req, res) => {
+  console.log('verify called');
+  let { signature } = req.body;
+  let verification = await certifier.verify(signature);
+
+  if (verification) {
+    res.status(200).send(JSON.parse(verification));
+  } else {
+    res.status(400).send({ message: 'Could not verify' });
+  }
+});
+
 async function main() {
   try {
     await redis.connect();
     console.log('api connected to redis');
+    certifier = await Certifier.getInstance();
+    console.log('api initialized key store');
+    app.listen(PORT, HOST, () => {
+      console.log(`Running on http://${HOST}:${PORT}`);
+    });
   } catch (err) {
-    console.error('Api failed to connect to redis', err);
+    console.error('Api failed to initialize', err);
   }
-
-  app.listen(PORT, HOST, () => {
-    console.log(`Running on http://${HOST}:${PORT}`);
-  });
 }
 
 main();

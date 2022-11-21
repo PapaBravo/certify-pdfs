@@ -46,7 +46,7 @@ async function renderPDF(html) {
 async function renderDocument(template, claim) {
     const certifier = await Certifier.getInstance();
     let signature = await certifier.sign(JSON.stringify(claim));
-    let input = await makeInput(template, claim, signature, 'localhost:3000/verify/');
+    let input = await makeInput(template, claim, signature, 'localhost:8081/verification.html?token=');
     let html = renderTemplate(template, input);
     return renderPDF(html);
 }

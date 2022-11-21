@@ -5,6 +5,8 @@ services:
     image: paul/certify-api
     ports: 
       - "8080:8080"
+    secrets:
+      - SIGN_PUBLIC_KEY
     build: 
       context: ../api
       dockerfile: Dockerfile
@@ -81,3 +83,5 @@ services:
 secrets:
   SIGN_PRIVATE_KEY:
     file: ./secrets/ec256-key-pair.pem
+  SIGN_PUBLIC_KEY:
+    file: ./secrets/ec256-public.pem

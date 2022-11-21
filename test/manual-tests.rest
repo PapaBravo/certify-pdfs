@@ -1,4 +1,4 @@
-# Test sign call
+### Test sign call
 
 POST http://localhost:8080/api/v1/sign HTTP/1.1
 content-type: application/json
@@ -6,4 +6,14 @@ content-type: application/json
 {
     "claim": "{\"firstName\": \"First\", \"lastName\": \"Last\"}",
     "documentKey": "ticket"
+}
+
+
+### Test verify
+
+POST http://localhost:8080/api/v1/verify HTTP/1.1
+content-type: application/json
+
+{
+    "signature": "eyJhbGciOiJFUzI1NiIsImtpZCI6InRlc3Qtc2lnbi1rZXkifQ.eyJmaXJzdE5hbWUiOiJGaXJzdCIsImxhc3ROYW1lIjoiTGFzdCJ9.TZoFkW1-qENnp5BYg2pYx1HVMMFZIuqzIy4Rx_kK0KeHLBJVwkJxN7iSJHDnLtaajle1w3XjoHMCxO6lPMQNvQ"
 }

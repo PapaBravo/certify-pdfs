@@ -72,6 +72,7 @@ services:
       /usr/bin/mc mb myminio/results;
       /usr/bin/mc mb myminio/templates;
       /usr/bin/mc od if=/template.html of=myminio/templates/ticket;
+      /usr/bin/mc anonymous set download myminio/results;
       exit 0;
       "
   client:

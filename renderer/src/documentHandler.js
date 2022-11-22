@@ -44,6 +44,8 @@ async function renderPDF(html) {
  * @returns {Promise<Buffer>}
  */
 async function renderDocument(template, claim) {
+    // TODO: REMOVE artificial delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
     const certifier = await Certifier.getInstance();
     let signature = await certifier.sign(JSON.stringify(claim));
     let input = await makeInput(template, claim, signature, 'localhost:8081/verification.html?token=');

@@ -12,6 +12,12 @@ const { Certifier } = require('./certifier');
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
+const SIGNALS = {
+  'SIGHUP': 1,
+  'SIGINT': 2,
+  'SIGTERM': 15
+};
+
 const redisConfig = {
   username: 'default',
   password: 'sOmE_sEcUrE_pAsS',
@@ -51,7 +57,7 @@ app.post('/api/v1/sign', async (req, res) => {
     console.log('Written', jobID);
 
     res.status(200);
-    res.send(jobID);
+    res.send({ jobID });
   } catch (err) {
     res.status(400);
     res.send(err.message);
@@ -72,7 +78,13 @@ app.post('/api/v1/verify', async (req, res) => {
 
 app.get('/api/v1/public-key', async (req, res) => {
   let key = certifier.getPublicKey();
-  res.status(200).send({key});
+  res.status(200).send({ key });
+});
+
+app.get('/api/v1/job/:id', async (req, res) => {
+  const jobID = req.params.id;
+  let job = await redis.json.get(`jobs:${jobID}`, '$');
+  res.status(200).send(job);
 });
 
 async function main() {
@@ -90,3 +102,10 @@ async function main() {
 }
 
 main();
+
+Object.keys(SIGNALS).forEach((signal) => {
+  process.on(signal, () => {
+    console.log(`process received a ${signal} signal`);
+    process.exit(0);
+  });
+});

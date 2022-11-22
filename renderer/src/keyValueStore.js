@@ -48,8 +48,28 @@ class KeyValueStore {
         return await this.redis.json.get(key, path);
     }
 
+    /**
+     * 
+     * @param {string | string[]} key 
+     * @param {string | string[]} path 
+     * @param {string | string[]} value 
+     * @returns 
+     */
     async setJSON(key, path, value) {
-        return await this.redis.json.get(key, path.value);
+        if (typeof key === 'string') {
+            return await this.redis.json.set(key, path, value);
+        } else {
+            if (key.length != path.length || key.length != value.length) {
+                throw new Error('Key, Path and Value must have the same length');
+            }
+
+            let multi = await this.redis.multi();
+
+            for (let i = 0; i < key.length; i++) {
+                await multi.json.set(key[i], path[i], value[i]);
+            }
+            return await multi.exec();
+        }
     }
 
 }

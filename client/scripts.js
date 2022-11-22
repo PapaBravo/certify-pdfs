@@ -39,10 +39,32 @@ async function requestDocumentClick() {
 }
 
 function renderJob(job, jobID) {
-    document.getElementById('td_jobid').textContent = jobID;
-    document.getElementById('td_status').textContent = job.status;
-    if (job.pdfUrl) {
-        document.getElementById('td_url')
-            .innerHTML = `<a href="${job.pdfUrl}">Document</a>`;
+    let container = document.getElementById(`result_${jobID}`);
+    if (!container) {
+        container = document.createElement('div');
+        let results = document.getElementById('results');
+        results.appendChild(container);
     }
+
+    container.classList = "result";
+    container.id = "result_" + jobID;
+    container.setAttribute("data-status", job.status);
+    let html = `
+<table>
+    <tbody>
+    <tr>
+        <th>JobID</th>
+        <td class="result_id">${jobID}</td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td>${job.status}</td>
+    </tr>
+    <tr>
+        <th>URL</th>
+        <td>${job.pdfUrl ? `<a href="${job.pdfUrl}">Document</a>` : ''}</td>
+    </tr>
+    </tbody>
+</table>`;
+    container.innerHTML = html;
 }

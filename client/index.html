@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,32 +8,40 @@
     <title>Document Certifier</title>
 
     <script type="text/javascript" src="scripts.js" defer></script>
+
+    <style>
+        div.result {
+            float: left;
+            margin-right: 0.5em;
+            margin-bottom: 0.5em;
+        }
+
+        div.result[data-status="WAITING"] {
+            background-color: lightblue;
+        }
+
+        div.result[data-status="RENDERING"] {
+            background-color: #fbec5d;
+        }
+
+        div.result[data-status="DONE"] {
+            background-color: #2e8b57;
+        }
+
+        td.result_id {
+            font-family: monospace;
+        }
+    </style>
+
 </head>
+
 <body>
     <header></header>
     <main>
         <button onclick="requestDocumentClick()">Request Document</button>
         <h3>Results</h3>
-        <table>
-            <tbody>
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                </tr>
-                <tr>
-                    <th>JobID</th>
-                    <td id="td_jobid"></td>
-                </tr>
-                <tr>
-                    <th>Status</th>
-                    <td id="td_status"></td>
-                </tr>
-                <tr>
-                    <th>URL</th>
-                    <td id="td_url"></td>
-                </tr>
-            </tbody>
-        </table>
+        <div id="results"></div>
     </main>
 </body>
+
 </html>

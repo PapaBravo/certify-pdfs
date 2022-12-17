@@ -6,10 +6,11 @@ const cors = require('cors');
 const { createClient } = require('redis');
 const { randomUUID } = require('crypto');
 
+const { config } = require('./config');
 const { Certifier } = require('./certifier');
 
 // Constants
-const PORT = 8080;
+const PORT = config.app.port;
 const HOST = '0.0.0.0';
 
 const SIGNALS = {
@@ -19,16 +20,16 @@ const SIGNALS = {
 };
 
 const redisConfig = {
-  username: 'default',
-  password: 'sOmE_sEcUrE_pAsS',
+  username: config.redis.user,
+  password: config.redis.password,
   socket: {
-    host: 'redis',
-    port: '6379'
+    host: config.redis.host,
+    port: config.redis.port
   }
 }
 
 const corsOptions = {
-  origin: ['http://localhost:8081'],
+  origin: config.app.allowedOrigins,
 }
 
 // Redis connection

@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:18.12.1-bullseye-slim
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -8,12 +8,16 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package*.json ./
 
-RUN npm install
+ENV NODE_ENV production
+
+RUN npm ci --only=production
 # If you are building your code for production
 # RUN npm ci --only=production
 
 # Bundle app source
 COPY . .
 
-EXPOSE 8080
+ENV PORT=8080
+EXPOSE $PORT
+USER node
 CMD [ "node", "server.js" ]

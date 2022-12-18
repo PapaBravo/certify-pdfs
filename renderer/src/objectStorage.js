@@ -1,12 +1,13 @@
 const Minio = require('minio');
 const { streamToBuffer } = require('./utils');
+const { config } = require('./config');
 
 const minio = new Minio.Client({
-    endPoint: 'minio',
-    port: 9000,
+    endPoint: config.minio.host,
+    port: config.minio.port,
     useSSL: false,
-    accessKey: 'minioadmin',
-    secretKey: 'minioadmin'
+    accessKey: config.minio.user,
+    secretKey: config.minio.password
 })
 
 class ObjectStorage {
@@ -60,4 +61,3 @@ class ObjectStorage {
 module.exports = {
     ObjectStorage
 }
-

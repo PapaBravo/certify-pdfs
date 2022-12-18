@@ -1,13 +1,14 @@
 const { createClient } = require('redis');
+const { config } = require('./config');
 
 const redisConfig = {
-    username: 'default',
-    password: 'sOmE_sEcUrE_pAsS',
+    username: config.redis.user,
+    password: config.redis.password,
     socket: {
-        host: 'redis',
-        port: '6379'
+      host: config.redis.host,
+      port: config.redis.port
     }
-}
+  }
 
 class KeyValueStore {
 

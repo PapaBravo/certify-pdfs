@@ -3,6 +3,7 @@ const Handlebars = require("handlebars");
 const wkhtmltopdf = require('wkhtmltopdf');
 const { streamToBuffer } = require('./utils');
 const { Certifier } = require('./certifier');
+const { config } = require('./config');
 
 async function generateQR(data) {
     const qr = await QRCode.toDataURL(data);
@@ -48,7 +49,7 @@ async function renderDocument(template, claim) {
     await new Promise(resolve => setTimeout(resolve, 2000));
     const certifier = await Certifier.getInstance();
     let signature = await certifier.sign(JSON.stringify(claim));
-    let input = await makeInput(template, claim, signature, 'localhost:8081/verification.html?token=');
+    let input = await makeInput(template, claim, signature, config.context.verificationUrl);
     let html = renderTemplate(template, input);
     return renderPDF(html);
 }

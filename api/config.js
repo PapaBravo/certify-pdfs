@@ -7,7 +7,9 @@ const config = {
         user: process.env.REDIS_USER || 'default',
         password: process.env.REDIS_PASSWORD || 'sOmE_sEcUrE_pAsS',
         host: process.env.REDIS_HOST || 'redis',
-        port: process.env.REDIS_PORT || '6379'
+        port: process.env.REDIS_PORT || '6379',
+        queueKey: process.env.REDIS_QUEUE || 'queue',
+        jobsKeyPrefix: process.env.REDIS_JOB_PREFIX || 'jobs:'
     }
 };
 

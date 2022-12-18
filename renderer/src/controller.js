@@ -1,6 +1,10 @@
 const { ObjectStorage } = require('./objectStorage');
 const { KeyValueStore } = require('./keyValueStore');
 const { renderDocument } = require('./documentHandler');
+const { config } = require('./config');
+
+const TEMPLATE_BUCKET = config.minio.templateBucketName;
+const RESULT_BUCKET = config.minio.resultBucketName;
 
 async function handleJob(jobID) {
     const keyStore = await KeyValueStore.getInstance();
@@ -11,15 +15,15 @@ async function handleJob(jobID) {
     console.log('Received job details for ' + jobID);
 
     await keyStore.setJSON(jobKey, '$.status', "RENDERING");
-    let template = await objectStore.getObject('templates', jobDetails.documentKey);
+    let template = await objectStore.getObject(TEMPLATE_BUCKET, jobDetails.documentKey);
     template = template.toString('utf8');
     let document = await renderDocument(template, JSON.parse(jobDetails.claim));
-    const objInfo = await objectStore.putObject('results', jobID + '.pdf', document);
+    const objInfo = await objectStore.putObject(RESULT_BUCKET, jobID + '.pdf', document);
 
     await keyStore.setJSON(
-        [jobKey, jobKey], 
-        ['$.status', '$.pdfUrl'], 
-        ["DONE", `http://localhost:9000/results/${jobID}.pdf`]
+        [jobKey, jobKey],
+        ['$.status', '$.pdfUrl'],
+        ["DONE", config.context.resultUrl + jobID + '.pdf']
     );
 
     console.log('wrote job result to store', objInfo);
@@ -29,7 +33,7 @@ function getNextJob() {
     console.log('Waiting for next job');
 
     KeyValueStore.getInstance()
-        .then(keyStore => keyStore.pop('queue'))
+        .then(keyStore => keyStore.pop(config.redis.queueKey))
         .then(({ element: jobID }) => handleJob(jobID))
         .then(getNextJob);
 }

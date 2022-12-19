@@ -2,6 +2,8 @@ const config = {
     context: {
         resultUrl: process.env.RESULT_URL || 'http://localhost:9000/results/',
         verificationUrl: process.env.VERIFICATION_URL || 'http://localhost:8081/verification.html?token=',
+        publicSignKey: Buffer.from(process.env.SIGN_PUBLIC_KEY, 'base64').toString('utf8'),
+        privateSignKey: Buffer.from(process.env.SIGN_PRIVATE_KEY, 'base64').toString('utf8')
     },
     redis: {
         user: process.env.REDIS_USER || 'default',

@@ -1,1 +1,2 @@
-docker-compose -f ./deployment/docker-compose.yml up --build --force-recreate --remove-orphans --renew-anon-volumes
+docker compose -f ./deployment/docker-compose.yml --env-file ./deployment/.env up \
+--build --force-recreate --remove-orphans --renew-anon-volumes

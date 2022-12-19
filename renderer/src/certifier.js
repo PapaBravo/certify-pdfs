@@ -1,5 +1,5 @@
 const jose = require('node-jose');
-const { readFile } = require('fs/promises');
+const { config } = require('./config');
 
 const kid = 'test-sign-key';
 
@@ -14,8 +14,7 @@ class Certifier {
     static async createAsyncInstance() {
         try {
             const keystore = jose.JWK.createKeyStore();
-            const keyFile = await readFile('/run/secrets/SIGN_PRIVATE_KEY', 'utf8');
-            let importedKey = (await jose.JWK.asKey(keyFile, "pem")).toJSON(true);
+            let importedKey = (await jose.JWK.asKey(config.context.privateSignKey, "pem")).toJSON(true);
             importedKey.kid = kid;
             await keystore.add(importedKey);
             return new Certifier(keystore);

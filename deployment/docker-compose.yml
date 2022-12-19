@@ -1,11 +1,11 @@
-version: "3.8"
+version: "3.3"
 
 services: 
   certify-api:
     image: paul/certify-api
     ports: 
       - "8080:8080"
-    secrets:
+    environment:
       - SIGN_PUBLIC_KEY
     build: 
       context: ../api
@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - SERVICE_ID=1
-    secrets:
+      - SIGN_PUBLIC_KEY
       - SIGN_PRIVATE_KEY
     depends_on:
       - redis
@@ -32,7 +32,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - SERVICE_ID=2
-    secrets:
+      - SIGN_PUBLIC_KEY
       - SIGN_PRIVATE_KEY
     depends_on:
       - redis
@@ -81,8 +81,3 @@ services:
       - "8081:80"
     volumes:
       - ../client:/usr/share/nginx/html:ro
-secrets:
-  SIGN_PRIVATE_KEY:
-    file: ./secrets/ec256-key-pair.pem
-  SIGN_PUBLIC_KEY:
-    file: ./secrets/ec256-public.pem

@@ -27,4 +27,7 @@ Generate a new key pair with
 ```sh
 openssl ecparam -name prime256v1 -genkey -noout -out ./deployment/secrets/ec256-key-pair.pem
 openssl ec -in ./deployment/secrets/ec256-key-pair.pem -pubout -out ./deployment/secrets/ec256-public.pem
+cat ./deployment/secrets/ec256-key-pair.pem | base64 -w 0 > ./deployment/secrets/ec256-key-pair.pem.base64
+cat ./deployment/secrets/ec256-public.pem | base64 -w 0 > ./deployment/secrets/ec256-public.pem.base64
 ```
+and add the base64 parts to the `deployments/.env` file.

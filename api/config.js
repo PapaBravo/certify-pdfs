@@ -10,6 +10,9 @@ const config = {
         port: process.env.REDIS_PORT || '6379',
         queueKey: process.env.REDIS_QUEUE || 'queue',
         jobsKeyPrefix: process.env.REDIS_JOB_PREFIX || 'jobs:'
+    },
+    context: {
+        publicSignKey: Buffer.from(process.env.SIGN_PUBLIC_KEY, 'base64').toString('utf8')
     }
 };
 

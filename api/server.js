@@ -44,6 +44,11 @@ app.options('*', cors());
 
 app.use(bodyParser.json())
 
+app.get('/', (req, res) => {
+  res.status(200);
+  res.send('ok');
+});
+
 app.post('/api/v1/sign', async (req, res) => {
   let { claim, documentKey } = req.body;
   let jobID = randomUUID();

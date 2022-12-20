@@ -25,9 +25,26 @@ sh ./start.sh
 Generate a new key pair with 
 
 ```sh
-openssl ecparam -name prime256v1 -genkey -noout -out ./deployment/secrets/ec256-key-pair.pem
-openssl ec -in ./deployment/secrets/ec256-key-pair.pem -pubout -out ./deployment/secrets/ec256-public.pem
-cat ./deployment/secrets/ec256-key-pair.pem | base64 -w 0 > ./deployment/secrets/ec256-key-pair.pem.base64
-cat ./deployment/secrets/ec256-public.pem | base64 -w 0 > ./deployment/secrets/ec256-public.pem.base64
+openssl ecparam -name prime256v1 -genkey -noout -out ./deployment/certify-pdfs/secrets/ec256-key-pair.pem
+openssl ec -in ./deployment/secrets/ec256-key-pair.pem -pubout -out ./deployment/certify-pdfs/secrets/ec256-public.pem
+cat ./deployment/certify-pdfs/secrets/ec256-key-pair.pem | base64 -w 0 > ./deployment/certify-pdfs/secrets/ec256-key-pair.pem.base64
+cat ./deployment/certify-pdfs/secrets/ec256-public.pem | base64 -w 0 > ./deployment/certify-pdfs/secrets/ec256-public.pem.base64
 ```
-and add the base64 parts to the `deployments/.env` file.
+and add the base64 parts to the `deployments/.env`.
+
+
+# Kubernetes / Helm
+
+```sh
+# run once to install dependencies
+cd deployment/
+helm dependency update ./certify-pdfs
+```
+
+```sh
+# Dashboard
+microk8s dashboard-proxy
+# Logging Proxy
+microk8s.kubectl port-forward -n kube-system service/kibana-logging 8181:5601
+
+```

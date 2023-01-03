@@ -12,7 +12,9 @@ const SIGNALS = {
 
 async function main() {
     await ObjectStorage.getInstance();
+    console.log('renderer connected to minio');
     await KeyValueStore.getInstance();
+    console.log('renderer connected to redis');
     getNextJob();
 }
 

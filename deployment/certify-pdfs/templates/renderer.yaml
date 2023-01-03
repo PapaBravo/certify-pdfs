@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-renderer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: renderer
+  template:
+    metadata:
+      labels:
+        app: renderer
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-renderer
+          image: {{ .Values.registry.url }}/certify-renderer
+          env:
+            - name: REDIS_HOST
+              value: {{ .Release.Name }}-redis-master
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-redis
+                  key: redis-password
+            - name: SIGN_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-signing
+                  key: SIGN_PUBLIC_KEY
+            - name: SIGN_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-signing
+                  key: SIGN_PRIVATE_KEY
+            - name: MINIO_HOST
+              value: {{ .Release.Name }}-minio
+            - name: MINIO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-minio
+                  key: rootUser
+            - name: MINIO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-minio
+                  key: rootPassword
+          imagePullPolicy: Always

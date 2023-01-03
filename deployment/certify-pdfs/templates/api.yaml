@@ -10,14 +10,6 @@ spec:
       targetPort: 8080
   type: LoadBalancer
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ .Release.Name }}-signing
-type: Opaque
-data: 
-  SIGN_PUBLIC_KEY: {{ .Files.Get "secrets/ec256-public.pem.base64" | b64enc }}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

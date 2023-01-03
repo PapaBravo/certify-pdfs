@@ -42,9 +42,18 @@ helm dependency update ./certify-pdfs
 ```
 
 ```sh
+# deploy locally
+cd deployment/
+sh deploy.sh
+```
+
+```sh
 # Dashboard
 microk8s dashboard-proxy
 # Logging Proxy
 microk8s.kubectl port-forward -n kube-system service/kibana-logging 8181:5601
+
+# Minio Dashboard
+microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep minio) 9001:9001
 
 ```

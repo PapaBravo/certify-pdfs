@@ -1,0 +1,27 @@
+<head>
+    <style>
+    </style>
+</head>
+
+<body class="A4">
+    <section class="sheet padding-10mm">
+        <h1>My Certificate</h1>
+        <table>
+            <tr>
+                <th>First Name</th>
+                <td>{{claim.firstName}}</td>
+            </tr>
+            <tr>
+                <th>Last Name</th>
+                <td>{{claim.lastName}}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{claim.date}}</td>
+            </tr>
+        </table>
+        <h1>Verification</h1>
+        {{{signature.qr}}}
+        <p><a href="{{signature.link}}">{{signature.text}}</a></p>
+    </section>
+</body>

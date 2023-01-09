@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-api
   labels:
-    release: "{{ .Release.Name }}"
+    release: {{ .Release.Name }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   selector:

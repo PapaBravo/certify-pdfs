@@ -1,4 +1,4 @@
-echo "add templates script is running"
-echo "connecting to $MINIO_HOST"
-mc alias set minio http://$MINIO_HOST:9000/ $MINIO_USER $MINIO_PASSWORD
-ls /data/templates/
+echo "post install job connecting to $MINIO_HOST"
+mc alias set minio http://$MINIO_HOST:$MINIO_PORT/ $MINIO_USER $MINIO_PASSWORD
+mc od if=/data/templates/template.html of=minio/templates/ticket
+mc anonymous set download minio/results

@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         app: renderer
+        release: {{ .Release.Name }}
     spec:
       containers:
         - name: {{ .Release.Name }}-renderer
@@ -38,6 +39,8 @@ spec:
                   key: SIGN_PRIVATE_KEY
             - name: MINIO_HOST
               value: {{ .Release.Name }}-minio
+            - name: MINIO_PORT
+              value: {{ quote .Values.minio.minioAPIPort }}
             - name: MINIO_USER
               valueFrom:
                 secretKeyRef:

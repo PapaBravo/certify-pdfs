@@ -33,6 +33,8 @@ spec:
           env:
             - name: MINIO_HOST
               value: {{ .Release.Name }}-minio
+            - name: MINIO_PORT
+              value: {{ quote .Values.minio.minioAPIPort }}
             - name: MINIO_USER
               valueFrom:
                 secretKeyRef:

@@ -50,6 +50,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/v1/sign', async (req, res) => {
+  console.log('Starting to sign doc for', req.body);
   let { claim, documentKey } = req.body;
   let jobID = randomUUID();
 
@@ -66,7 +67,8 @@ app.post('/api/v1/sign', async (req, res) => {
     res.send({ jobID });
   } catch (err) {
     res.status(400);
-    res.send(err.message);
+    console.log("Error signing document", err.message);
+    res.send({message: "Error signing document: " + err.message});
   }
 });
 

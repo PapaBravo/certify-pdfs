@@ -45,34 +45,32 @@ class KeyValueStore {
         return await this.redis.BRPOP(key, 0);
     }
 
-    async getJSON(key, path) {
-        return await this.redis.json.get(key, path);
+    async getJSON(key) {
+        return await this.redis.HGETALL(key);
     }
-
+    
     /**
      * 
      * @param {string | string[]} key 
-     * @param {string | string[]} path 
-     * @param {string | string[]} value 
+     * @param {object | object[]} data field-value-map
      * @returns 
      */
-    async setJSON(key, path, value) {
+    async setJSON(key, data) {
         if (typeof key === 'string') {
-            return await this.redis.json.set(key, path, value);
+            return await this.redis.HSET(key, data);
         } else {
-            if (key.length != path.length || key.length != value.length) {
-                throw new Error('Key, Path and Value must have the same length');
+            if (key.length != data.length ) {
+                throw new Error('Key and data must have the same length');
             }
 
             let multi = await this.redis.multi();
 
             for (let i = 0; i < key.length; i++) {
-                await multi.json.set(key[i], path[i], value[i]);
+                await multi.HSET(key[i], data[i]);
             }
             return await multi.exec();
         }
     }
-
 }
 
 module.exports = {

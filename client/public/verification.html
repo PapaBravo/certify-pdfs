@@ -9,6 +9,8 @@
 
     <script type="text/javascript" src="vendor/jose.umd.js"></script>
     <script>
+       const BASE_URL = 'http://localhost:8082/api/v1';
+
         function renderSuccess(verification, verificationSide) {
             let el = document.getElementById(`${verificationSide}_side_container`);
             el.innerHTML = (`<pre>${JSON.stringify(verification, null, 2)}</pre>`);
@@ -17,7 +19,7 @@
 
         async function verifyClientSide(signature) {
 
-            let publicKey = await fetch('http://localhost:8080/api/v1/public-key');
+            let publicKey = await fetch(`${BASE_URL}/public-key`);
             publicKey = await publicKey.json();
             publicKey = await jose.importJWK(publicKey.key, 'ES256')
 
@@ -28,7 +30,7 @@
 
 
         async function verifyServerSide(signature) {
-            let verification = await fetch('http://localhost:8080/api/v1/verify',
+            let verification = await fetch(`${BASE_URL}/verify`,
                 {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },

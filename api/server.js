@@ -58,7 +58,7 @@ app.post('/api/v1/sign', async (req, res) => {
 
   try {
     await redis.multi()
-      .json.set(`${config.redis.jobsKeyPrefix}${jobID}`, '$', jobData, { NX: true })
+      .HSET(`${config.redis.jobsKeyPrefix}${jobID}`, jobData, {NX: true})
       .LPUSH(config.redis.queueKey, jobID)
       .exec();
     console.log('Written', jobID);
@@ -91,7 +91,7 @@ app.get('/api/v1/public-key', async (req, res) => {
 
 app.get('/api/v1/job/:id', async (req, res) => {
   const jobID = req.params.id;
-  let job = await redis.json.get(`${config.redis.jobsKeyPrefix}${jobID}`, '$');
+  let job = await redis.HGETALL(`${config.redis.jobsKeyPrefix}${jobID}`);
   res.status(200).send(job);
 });
 

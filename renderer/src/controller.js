@@ -11,10 +11,10 @@ async function handleJob(jobID) {
     const objectStore = await ObjectStorage.getInstance();
     const jobKey = `jobs:${jobID}`;
 
-    const jobDetails = await keyStore.getJSON(jobKey, '$');
+    const jobDetails = await keyStore.getJSON(jobKey);
     console.log('Received job details for ' + jobID);
 
-    await keyStore.setJSON(jobKey, '$.status', "RENDERING");
+    await keyStore.setJSON(jobKey, {status: "RENDERING"});
     let template = await objectStore.getObject(TEMPLATE_BUCKET, jobDetails.documentKey);
     template = template.toString('utf8');
     let document = await renderDocument(template, JSON.parse(jobDetails.claim));
@@ -22,8 +22,7 @@ async function handleJob(jobID) {
 
     await keyStore.setJSON(
         [jobKey, jobKey],
-        ['$.status', '$.pdfUrl'],
-        ["DONE", config.context.resultUrl + jobID + '.pdf']
+        [{status: "DONE"}, {pdfUrl: config.context.resultUrl + jobID + '.pdf'}]
     );
 
     console.log('wrote job result to store', objInfo);

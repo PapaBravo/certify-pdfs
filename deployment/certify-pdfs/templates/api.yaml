@@ -10,7 +10,7 @@ spec:
     app: server
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: {{ .Values.api.port }}
   type: LoadBalancer
 ---
 apiVersion: apps/v1
@@ -36,7 +36,7 @@ spec:
           image: {{ .Values.registry.url }}/certify-api
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: {{ .Values.api.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -48,7 +48,9 @@ spec:
               port: http
           env:
             - name: PORT
-              value: "8080"
+              value: "{{ .Values.api.port }}"
+            - name: ORIGINS
+              value: "http://localhost:{{ .Values.client.port }}"
             - name: REDIS_HOST
               value: {{ .Release.Name }}-redis-master
             - name: REDIS_PASSWORD

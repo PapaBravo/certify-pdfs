@@ -56,7 +56,12 @@ microk8s.kubectl port-forward -n kube-system service/kibana-logging 8181:5601
 # Minio Dashboard
 microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep certify-pdfs-minio-[^p]) 9001:9001
 
+# Minio values
+microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep certify-pdfs-minio-[^p]) 9000:9000
+
 # Certifier API
 microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep certify-pdfs-api ) 8080:8080
 
+# client
+microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep cI think I ertify-pdfs-client ) 8084:80
 ```

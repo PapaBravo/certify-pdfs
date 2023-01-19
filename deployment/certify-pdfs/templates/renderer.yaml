@@ -20,6 +20,8 @@ spec:
         - name: {{ .Release.Name }}-renderer
           image: {{ .Values.registry.url }}/certify-renderer
           env:
+            - name: VERIFICATION_URL
+              value: "http://localhost:{{ .Values.client.port }}/verification.html?token="
             - name: REDIS_HOST
               value: {{ .Release.Name }}-redis-master
             - name: REDIS_PASSWORD

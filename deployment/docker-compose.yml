@@ -77,11 +77,11 @@ services:
       exit 0;
       "
   client:
-    image: nginx:1.23.2-alpine
+    image: paul/certify-client
+    build: 
+      context: ../client
+      dockerfile: Dockerfile
     ports:
       - "8081:80"
     environment:
       - API_URL=http://localhost:8082/api/v1
-    volumes:
-      - ../client/public:/usr/share/nginx/html:ro
-      - ../client/entrypoint/add_env.sh:/docker-entrypoint.d/add_env.sh

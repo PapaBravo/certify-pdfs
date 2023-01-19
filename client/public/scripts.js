@@ -1,7 +1,5 @@
-const BASE_URL = 'http://localhost:8082/api/v1';
-
 async function sendRequest(path, data) {
-    let response = await fetch(`${BASE_URL}${path}`, {
+    let response = await fetch(`${API_URL}${path}`, {
         method: data ? "POST" : "GET",
         body: data ? JSON.stringify(data) : undefined,
         headers: {

@@ -4,7 +4,22 @@
 
 !includeurl KubernetesPuml/kubernetes_Common.puml
 !includeurl KubernetesPuml/kubernetes_Context.puml
-!includeurl KubernetesPuml/kubernetes_Simplified.puml
+' !includeurl KubernetesPuml/kubernetes_Simplified.puml
+
+hide stereotype
+
+!definelong KubernetesEntityColoring(e_stereo)
+skinparam rectangle<<e_stereo>> {
+    BackgroundColor KUBERNETES_BG_COLOR
+    BorderColor transparent
+    Shadowing false
+}
+!enddefinelong
+
+
+!definelong KubernetesEntity(e_alias, e_label, e_techn, e_descr, e_color, e_sprite, e_stereo)
+rectangle "==e_label\n<color:e_color><$e_sprite></color>\n e_descr" <<e_stereo>> as e_alias
+!enddefinelong
 
 !includeurl KubernetesPuml/OSS/KubernetesSvc.puml
 !includeurl KubernetesPuml/OSS/KubernetesIng.puml
@@ -19,80 +34,65 @@
 skinparam nodesep 10
 skinparam ranksep 10
 
+
 actor "User" as user
 actor "External\nApplication" as extApp
 left to right direction
 
 Cluster_Boundary(cluster, "MikroK8s") {
     Namespace_Boundary(ns_default, "default") {
-        KubernetesSvc(svc, "service", "")
-        KubernetesPod(pod_api, "api", "")
-        KubernetesPod(pod_client, "client", "")
-        KubernetesPod(pod_renderer, "renderer", "")
+        KubernetesIng(ingress, "ingress", "", "")
         
-        ' frame chart_minio as "minio chart" {
-            KubernetesPod(pod_minio, "minio", "")
+        KubernetesSvc(svc_api, "api", "", "")
+        KubernetesPod(pod_api, "api", "", "")
+        Rel(svc_api, pod_api, "")
+
+
+        KubernetesSvc(svc_client, "client service", "", "")
+        KubernetesPod(pod_client, "client", "", "")
+        Rel(svc_client, pod_client, "")
+        
+        KubernetesPod(pod_renderer, "renderer", "", "")
+
+        frame chart_minio as "minio chart" {
+            KubernetesPod(svc_minio, "minio service", "", "")
+            KubernetesPod(pod_minio, "minio", "", "")
             ' KubernetesSts(sts_minio, "minio", "")
             ' KubernetesSecret(secret_minio_credentials, "credentials","")
-        ' }
+        }
         
-        KubernetesJob(job_minio, "minio post install", "")
+        KubernetesJob(job_minio, "minio post install", "", "")
         
-        ' frame chart_redis as "redis chart" {
-            KubernetesPod(pod_redis, "redis", "")
+        frame chart_redis as "redis chart" {
+            KubernetesPod(svc_redis, "redis service", "", "")
+            KubernetesPod(pod_redis, "redis", "", "")
         '     KubernetesSts(sts_redis, "redis", "")
         '     KubernetesSecret(secret_redis_credentials, "credentials","")
-        ' }
+        }
     }
 
-    Namespace_Boundary(ns_kubespace, "kubespace") {
-        KubernetesSvc(svc_elastic, "elastic", "")
-        KubernetesSvc(svc_registry, "registry", "")
+    Namespace_Boundary(ns_registry, "Registry") {
+        KubernetesSvc(svc_registry, "registry", "", "")
+    }
 
+        Namespace_Boundary(ns_kube_system, "Kube System") {
+        KubernetesSvc(svc_elastic, "elastic", "", "")
+        KubernetesSvc(svc_kibana, "kibana", "", "")
     }
 }
 
-' Cluster_Boundary(cluster, "Kubernetes Cluster") {
-'     Namespace_Boundary(ns, "Back End") {
-'         KubernetesIng(ingress, "your.domain.com", "")
-'         KubernetesSvc(svc, "service", "")
-'         KubernetesPod(pod1, "pod1", "")
-'         KubernetesPod(pod2, "pod2", "")
-'         KubernetesPod(pod3, "pod3", "")
+Rel(user, ingress, "Access GUI\nlocalhost:8080")
+Rel(user, ingress, "Access results\nlocalhost:9000")
+Rel(user, ingress, "Access API (via GUI)\nlocalhost:8081")
+Rel(extApp, ingress, "Access API\nlocalhost:8081")
 
-'         KubernetesRs(rs,"","")
-'         KubernetesDeploy(deploy,"deployment","")
-'         KubernetesHpa(hpa, "HPA", "")
-'     }
-' }
+Rel(ingress,svc_api, "Forward API\n8081:80")
+Rel(ingress,svc_client, "Forward GUI\n8080:80")
+Rel(ingress,svc_minio, "Forward results\n9000:9000")
 
-' Rel(userAlias,ingress," ")
-' Rel(ingress,svc," ")
+Rel(job_minio, svc_minio, "")
 
-Rel(user, svc, "Access GUI\nlocalhost:8080")
-Rel(user, svc, "Access results\nlocalhost:9000")
-Rel(user, svc, "Access API (via GUI)\nlocalhost:8081")
-Rel(extApp, svc, "Access API\nlocalhost:8081")
-
-Rel(svc,pod_api, "Forward API\n8081:80")
-Rel(svc,pod_client, "Forward GUI\n8080:80")
-Rel(svc,pod_minio, "Forward results\n9000:9000")
-
-Rel(job_minio, pod_minio, "Add templates")
-
-Rel(pod_renderer,pod_redis,"Subscribe to Jobs")
-Rel(pod_api,pod_redis,"Write Jobs")
-Rel(pod_renderer,pod_redis,"Write Jobs, Results")
-Rel(pod_renderer,pod_minio,"Write Results")
-
-' Rel(svc,pod1," ")
-' Rel(svc,pod2," ")
-' Rel(svc,pod3," ")
-
-' Rel_U(rs,pod1," ")
-' Rel_U(rs,pod2," ")
-' Rel_U(rs,pod3," ")
-
-' Rel_U(deploy,rs, " ")
-' Rel_U(hpa,deploy, " ")
+Rel(pod_api,svc_redis,"")
+Rel(pod_renderer,svc_redis, "")
+Rel(pod_renderer,svc_minio,"")
 @enduml

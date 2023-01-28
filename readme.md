@@ -1,3 +1,7 @@
+# Introduction
+
+![Box View L1 Whitebox](doc/box-view-L1-whitebox.drawio.png "L1 Whitebox")
+
 ## Redis
 
 ### Data Model

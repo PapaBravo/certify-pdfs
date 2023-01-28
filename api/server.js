@@ -1,6 +1,6 @@
 'use strict';
 
-const logger = require('./src/logger');
+const { logger, expressLogger } = require('./src/logger');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -40,7 +40,8 @@ const app = express();
 app.use(cors(corsOptions));
 app.options('*', cors());
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+app.use(expressLogger);
 
 app.get('/', (req, res) => {
   res.status(200);

@@ -1,6 +1,6 @@
 const { createClient } = require('redis');
 const { config } = require('./config');
-const logger = require('./logger');
+const { logger } = require('./logger');
 
 const redisConfig = {
     username: config.redis.user,

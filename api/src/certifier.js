@@ -1,4 +1,4 @@
-const logger = require('./logger');
+const { logger } = require('./logger');
 const jose = require('node-jose');
 const { config } = require('./config');
 

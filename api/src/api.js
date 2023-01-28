@@ -1,8 +1,7 @@
-const logger = require('./logger');
+const { logger } = require('./logger');
 const { Certifier } = require('./certifier');
 const { KeyValueStore } = require('./keyValueStore');
 const { config } = require('./config');
-
 
 const { randomUUID } = require('crypto');
 

@@ -1,5 +1,6 @@
 const { createClient } = require('redis');
 const { config } = require('./config');
+const logger = require('./logger');
 
 const redisConfig = {
     username: config.redis.user,
@@ -15,7 +16,6 @@ class KeyValueStore {
     static instance = null;
 
     constructor(redis) {
-        console.log('key value client created');
         this.redis = redis;
     }
 
@@ -23,11 +23,10 @@ class KeyValueStore {
         try {
             const redis = createClient(redisConfig);
             await redis.connect();
-            console.log('renderer connected to key value store');
-
+            logger.info('Connected to key value store.');
             return new KeyValueStore(redis);
         } catch (err) {
-            console.error('Renderer failed to connect to key value store', err);
+            logger.error('Failed to connect to key value store: %s', err.message);
             KeyValueStore.instance = null;
             throw err;
         }

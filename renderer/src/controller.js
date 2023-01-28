@@ -1,3 +1,4 @@
+const logger = require('./logger');
 const { ObjectStorage } = require('./objectStorage');
 const { KeyValueStore } = require('./keyValueStore');
 const { renderDocument } = require('./documentHandler');
@@ -12,7 +13,7 @@ async function handleJob(jobID) {
     const jobKey = `jobs:${jobID}`;
 
     const jobDetails = await keyStore.getJSON(jobKey);
-    console.log('Received job details for ' + jobID);
+    logger.info('Received job details for ' + jobID);
 
     await keyStore.setJSON(jobKey, {status: "RENDERING"});
     let template = await objectStore.getObject(TEMPLATE_BUCKET, jobDetails.documentKey);
@@ -25,11 +26,11 @@ async function handleJob(jobID) {
         [{status: "DONE"}, {pdfUrl: config.context.resultUrl + jobID + '.pdf'}]
     );
 
-    console.log('wrote job result to store', objInfo);
+    logger.info('wrote job result to store %o', objInfo);
 }
 
 function getNextJob() {
-    console.log('Waiting for next job');
+    logger.info('Waiting for next job');
 
     KeyValueStore.getInstance()
         .then(keyStore => keyStore.pop(config.redis.queueKey))

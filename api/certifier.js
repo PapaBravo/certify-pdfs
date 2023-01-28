@@ -1,3 +1,4 @@
+const logger = require('./logger');
 const jose = require('node-jose');
 const { config } = require('./config');
 
@@ -19,7 +20,7 @@ class Certifier {
             await keystore.add(importedKey);
             return new Certifier(keystore);
         } catch (err) {
-            console.error('Failed to create key store', err);
+            logger.error('Failed to create key store: %s', err.message);
             Certifier.instance = null;
             throw err;
         }

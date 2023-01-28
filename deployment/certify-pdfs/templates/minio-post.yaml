@@ -13,6 +13,7 @@ metadata:
   name: "{{ .Release.Name }}-post-install"
   labels:
     release: "{{ .Release.Name }}"
+    deploymentTime: {{ now | date "20060102150405" | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   annotations:
     "helm.sh/hook": "post-install,post-upgrade"
@@ -23,7 +24,10 @@ spec:
     metadata:
       name: {{ .Release.Name }}
       labels:
+        deploymentTime: {{ now | date "20060102150405" | quote }}
         release: {{ .Release.Name }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: minio-post
     spec:
       restartPolicy: Never
       containers:

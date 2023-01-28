@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-api
   labels:
     release: {{ .Release.Name }}
+    deploymentTime: {{ now | date "20060102150405" | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   selector:
@@ -19,6 +20,7 @@ metadata:
   name: {{ .Release.Name }}-api
   labels:
     release: {{ .Release.Name }}
+    deploymentTime: {{ now | date "20060102150405" | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   replicas: 1
@@ -30,6 +32,8 @@ spec:
       labels:
         app: api
         release: {{ .Release.Name }}
+        deploymentTime: {{ now | date "20060102150405" | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
       containers:
         - name: {{ .Release.Name }}-api

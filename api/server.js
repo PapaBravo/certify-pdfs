@@ -1,5 +1,6 @@
 'use strict';
 
+const logger = require('./logger');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -18,6 +19,16 @@ const SIGNALS = {
   'SIGINT': 2,
   'SIGTERM': 15
 };
+
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught Exception: %o At %s', err.message, err.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+  logger.error('Unhandled Rejection: %o At %s', err.message, err.stack);
+  process.exit(1);
+});
 
 const redisConfig = {
   username: config.redis.user,
@@ -50,7 +61,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/v1/sign', async (req, res) => {
-  console.log('Starting to sign doc for', req.body);
+  logger.info('Starting to sign doc for %o', req.body);
   let { claim, documentKey } = req.body;
   let jobID = randomUUID();
 
@@ -61,19 +72,19 @@ app.post('/api/v1/sign', async (req, res) => {
       .HSET(`${config.redis.jobsKeyPrefix}${jobID}`, jobData, {NX: true})
       .LPUSH(config.redis.queueKey, jobID)
       .exec();
-    console.log('Written', jobID);
+    logger.info('Written job %s', jobID);
 
     res.status(200);
     res.send({ jobID });
   } catch (err) {
     res.status(400);
-    console.log("Error signing document", err.message);
+    logger.error("Error signing document: %s", err.message);
     res.send({message: "Error signing document: " + err.message});
   }
 });
 
 app.post('/api/v1/verify', async (req, res) => {
-  console.log('verify called');
+  logger.info('verify called');
   let { signature } = req.body;
   let verification = await certifier.verify(signature);
 
@@ -98,22 +109,22 @@ app.get('/api/v1/job/:id', async (req, res) => {
 async function main() {
   try {
     await redis.connect();
-    console.log('api connected to redis');
+    logger.info('api connected to redis');
     certifier = await Certifier.getInstance();
-    console.log('api initialized key store');
+    logger.info('api initialized key store');
     app.listen(PORT, HOST, () => {
-      console.log(`Running on http://${HOST}:${PORT}`);
+      logger.info(`Running on http://${HOST}:${PORT}`);
     });
   } catch (err) {
-    console.error('Api failed to initialize', err);
+    logger.error('Api failed to initialize: %s', err.message);
   }
 }
 
-main();
-
 Object.keys(SIGNALS).forEach((signal) => {
   process.on(signal, () => {
-    console.log(`process received a ${signal} signal`);
+    logger.info(`process received a ${signal} signal`);
     process.exit(0);
   });
 });
+
+main();

@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-renderer
   labels:
     release: {{ .Release.Name }}
+    deploymentTime: {{ now | date "20060102150405" | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   replicas: 2
@@ -14,6 +15,8 @@ spec:
     metadata:
       labels:
         app: renderer
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        deploymentTime: {{ now | date "20060102150405" | quote }}
         release: {{ .Release.Name }}
     spec:
       containers:

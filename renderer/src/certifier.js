@@ -1,3 +1,4 @@
+const logger = require('./logger');
 const jose = require('node-jose');
 const { config } = require('./config');
 
@@ -17,9 +18,10 @@ class Certifier {
             let importedKey = (await jose.JWK.asKey(config.context.privateSignKey, "pem")).toJSON(true);
             importedKey.kid = kid;
             await keystore.add(importedKey);
+            logger.info('Cryptographic key store initialized.')
             return new Certifier(keystore);
         } catch (err) {
-            console.error('Failed to create key store', err);
+            logger.error('Failed to create key store $s', err.message);
             Certifier.instance = null;
             throw err;
         }

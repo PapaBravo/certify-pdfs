@@ -1,6 +1,7 @@
 const Minio = require('minio');
 const { streamToBuffer } = require('./utils');
 const { config } = require('./config');
+const logger = require('./logger');
 
 const minio = new Minio.Client({
     endPoint: config.minio.host,
@@ -15,7 +16,6 @@ class ObjectStorage {
     static instance = null;
 
     constructor() {
-        console.log('object storage client created');
     }
 
     /**
@@ -43,6 +43,7 @@ class ObjectStorage {
 
     static async createAsyncInstance() {
         try {
+            logger.info('Creating new minio client.');
             return new ObjectStorage();
         } catch (err) {
             ObjectStorage.instance = null;

@@ -1,0 +1,75 @@
+@startuml runtime-signing
+
+autonumber
+skinparam NoteBackgroundColor #White
+
+participant client
+participant API
+database redis
+collections renderer
+database "S3 like\nstorage" as storage 
+
+== Generation ==
+
+renderer ->> redis: Listen for new jobs\n""BRPOP queue""
+
+client -> API++: ""POST /sign""
+note left
+""documentKey: ""
+""  <color:blue>$documentKey""
+""claim:""
+""  <color:green>$claim""
+end note
+
+rnote over API: Generate ""**$jobID**""
+
+API ->> redis++: Add new job
+note right
+""LPUSH queue **$jobID**""
+""HSET jobs:**$jobID**""
+""  documentKey <color:blue>$documentKey""
+""  claim       <color:green>$claim""
+""  status      "WAITING"""
+""  date        //now()//""
+end note
+API --> client--: ""**$jobID**""
+
+redis -> renderer--++: Notify about new job\n""BRPOP queue""
+renderer ->> redis: ""HSET **$jobID** status "RENDERING"""
+renderer -> storage: Get template for ""<color:blue>$documentKey""
+storage --> renderer
+
+rnote over renderer: Sign ""<color:green>$claim""\nwith ""**$privateKey**""\nfor ""**$signature**""
+rnote over renderer: Populate template with\n""<color:green>$claim</color>, **$signature**""
+rnote over renderer: ""wkhtmltopdf""
+
+renderer -> storage: PUT pdf
+storage -> renderer: ""**$pdfURL**""
+
+renderer ->> redis--: Set job to done
+
+note right
+""HSET jobs:**$jobID**""
+""  status "DONE"""
+""  pdfURL **$pdfURL**"""
+end note
+
+== Retrieval (done) ==
+
+[->> client++: Timer
+client -> API++: ""GET /job/**$jobID**""
+API -> redis++: ""HMGET **$jobID** status pdfURL""
+return """DONE", **$pdfURL**""
+return ""200 **$pdfURL**""
+client -> storage++: ""GET **$pdfURL**""
+return PDF
+deactivate client
+
+== Retrieval (not done) ==
+[->> client++: Timer
+client -> API++: ""GET /job/**$jobID**""
+API -> redis++: ""HMGET **$jobID** status pdfURL""
+return """WAITING""" or """RENDERING"""
+return ""200 status""
+deactivate client
+@enduml

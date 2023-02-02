@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-test"
+  labels:
+    release: {{ .Release.Name }}
+    deploymentTime: {{ now | date "20060102150405" | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: {{ .Release.Name }}-integration-test
+      image: {{ .Values.registry.url }}/certify-test
+      imagePullPolicy: Always
+      env:
+      - name: API_URL
+        value: "http://{{ .Release.Name }}-api:{{ .Values.api.port }}/api/v1"
+  restartPolicy: Never

@@ -19,6 +19,12 @@
 | documentKey | string                          |
 | claim       | string (json)                   |
 | pdfUrl      | string                          |
+# Testing
+After startup, run
+```sh
+cd deployment
+helm test certify-pdfs --logs
+```
 
 # Start up
 Using docker-compose, the whole system can be started with 

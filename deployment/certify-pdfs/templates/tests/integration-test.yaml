@@ -3,6 +3,7 @@ kind: Pod
 metadata:
   name: "{{ .Release.Name }}-test"
   labels:
+    app: test
     release: {{ .Release.Name }}
     deploymentTime: {{ now | date "20060102150405" | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"

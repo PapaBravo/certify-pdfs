@@ -78,3 +78,9 @@ microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep certify
 # client
 microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep cI think I ertify-pdfs-client ) 8084:80
 ```
+
+## Testing
+```sh
+cd deployment/
+helm test certify-pdfs --logs
+```

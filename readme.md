@@ -1,9 +1,6 @@
 # Introduction
 
-![Box View L1 Whitebox](doc/box-view-L1-whitebox.drawio.png "L1 Whitebox")
-![Box View L2 Renderer](doc/box-view-L2-renderer.drawio.png "L2 Renderer")
-![Deployment](doc/deployment.drawio.png "Deployment")
-![Runtime Signing](doc/runtime-signing.png "Runtime Signing")
+For architecture, see [architecture documentation](doc/architecture.adoc)
 
 ## Redis
 

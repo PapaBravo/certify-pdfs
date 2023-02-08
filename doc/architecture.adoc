@@ -57,6 +57,12 @@ The system uses the https://redis.io/docs/manual/pubsub/[redis pubsup] mechanism
 .Box View L1 Whitebox
 image:box-view-L1-whitebox.drawio.png[L1 Whitebox]
 
+|===
+|Component (Reference) | Description
+
+| link:/client[Sample Client]
+| A static website consuming the API endpoints and giving a minimalistic GUI for testing users.
+|===
 === Building Block Level 2
 image:box-view-L2-renderer.drawio.png[L2 Renderer]
 
@@ -68,4 +74,58 @@ image:runtime-signing.png[Runtime Signing]
 image:deployment.drawio.png[Deployment]
 
 == Crosscutting Concepts
+=== Persistence
+
+.Datamodel of Redis https://redis.io/docs/data-types/hashes/[hashes] `jobs:$uuid`
+[cols="1,5"]
+|===
+|     field     |              type               
+
+| `date`        | `string` ( iso8601 )                
+| `status`      | `string` ( `WAITING,RENDERING,DONE` ) 
+| `documentKey` | `string`                          
+| `claim`       | `string` ( json )                   
+| `pdfUrl`      | `string`                          
+|===
+
+The queue is a Redis https://redis.io/docs/data-types/lists/[list] under the key `queue`.
+
 === Cryptography
+
+== Architectual Decisions
+
+[cols="2,10"]
+|===
+| Title | Description 
+
+| No Certificates 
+| The cryptographic implementation only uses public/private key pairs instead of a PKI. 
+
+This will require a refactoring when a full tenant system is implemented.
+
+The reason for this choice was ease of implementation.
+| Redis as Queue 
+| Instead of using a full fletched queue system like RabbitMQ or Kafka, the Redis PubSub mechanism is used.
+
+It is likely that future extensions of the system require a more robust feature set on the queue. Refactoring the system to use a different queue should be doable with moderate effort.
+
+Again, the main reason for the decision was ease of implementation, specifically avoiding additional components to be deployed.
+|===
+
+== Quality Requirements
+
+== Risks and Technical Debt
+
+[cols="1,5,5"]
+|===
+| Title | Description | Mitigation
+
+| No Certificates 
+| The cryptographic implementation only uses public/private key pairs instead of a PKI.
+| When moving to one key per document, the switch to a PKI has to be made. The crypto library https://github.com/cisco/node-jose#managing-keys[node-jose] supports PKIX X.509 certificates.
+
+| No Auth 
+| Currently all endpoints, specifically the sign endpoint is not protected in any way. 
+| The used HTTP server library https://expressjs.com/[express] has OIDC supporting https://github.com/auth0/express-openid-connect[middleware] available.
+
+|===

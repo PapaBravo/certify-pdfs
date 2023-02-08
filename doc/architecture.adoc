@@ -52,23 +52,51 @@ image:business-context.drawio.png[Business Context]
 == Solution Strategy
 The system uses the https://redis.io/docs/manual/pubsub/[redis pubsup] mechanism as a simple work queue. That way the technologically complex rendering process is isolated and can be changed later. It also allowes independend scaling of the resource demanding task.
 
+The claim is stringified and a https://www.rfc-editor.org/rfc/rfc7515[JSON Web Signature (JWS)] is generated. This signature is embedded in the resulting pdf document both in plain text and as a convinient QRCode leading to a verification endpoint.
+
 == Building Block View
 === Building Block Level 1
 .Box View L1 Whitebox
 image:box-view-L1-whitebox.drawio.png[L1 Whitebox]
 
+[cols="1,5"]
 |===
 |Component (Reference) | Description
 
-| link:/client[Sample Client]
-| A static website consuming the API endpoints and giving a minimalistic GUI for testing users.
+|link:/client[Sample Client]
+|A static website consuming the API endpoints and giving a minimalistic GUI for testing users.
+|link:/api[API Server]
+|An express server providing the external API and forwarding new jobs to the queue.
+|link:/renderer[Renderer]
+|A nodeJS application subscribing to the queue for new jobs and rendering them.
+|https://github.com/minio/minio/tree/master/helm/minio[Object Store]
+|An S3 like object storage included as a helm subchart.
+|https://bitnami.com/stack/redis/helm[Redis]
+|A key value store included as a helm subchart.
 |===
 === Building Block Level 2
 image:box-view-L2-renderer.drawio.png[L2 Renderer]
+[cols="1,5"]
+|===
+|Component (Reference) | Description
 
+|link:/renderer/src/controller.js[controller.js]
+|The main loop of the server, subscribing to the queue, starting the rendering process and writing the result back into the queue and the object storage.
+|link:/renderer/src/documentHandler.js[documentHandler.js]
+|The rendering component using the npm libraries https://www.npmjs.com/package/qrcode[qrcode] to generate a QR code image, https://www.npmjs.com/package/handlebars[handlebars] as the html template engine. For rendering to pdf it uses the debian package https://wkhtmltopdf.org/[wkhtmltopdf] installed on the docker container level.
+|link:/renderer/src/certifier.js[certifier.js]
+|The component responsible signing a json document. Using the npm library https://github.com/cisco/node-jose[node-jose] generating https://www.rfc-editor.org/rfc/rfc7515[JSON Web Signatures (JWS)].
+|link:/renderer/src/objectStorage.js[objectStorage.js]
+|A facade for the official https://www.npmjs.com/package/minio[minio SDK].
+|link:/renderer/src/keyValueStore.js[keyValueStore.js]
+|A facade for the official https://www.npmjs.com/package/redis[redis SDK].
+|===
 == Runtime View
-.Runtime Signing
+=== Signing
 image:runtime-signing.png[Runtime Signing]
+
+=== Verification
+TODO: Add Runtime view for verification
 
 == Deployment View
 image:deployment.drawio.png[Deployment]
@@ -91,6 +119,10 @@ image:deployment.drawio.png[Deployment]
 The queue is a Redis https://redis.io/docs/data-types/lists/[list] under the key `queue`.
 
 === Cryptography
+TODO: describe cryptography thoughts
+
+=== Logging
+TODO: describe logging
 
 == Architectual Decisions
 

@@ -49,6 +49,8 @@ image:business-case.drawio.png[Business Case]
 .Business Context
 image:business-context.drawio.png[Business Context]
 
+=== Technical Context
+
 == Solution Strategy
 The system uses the https://redis.io/docs/manual/pubsub/[redis pubsup] mechanism as a simple work queue. That way the technologically complex rendering process is isolated and can be changed later. It also allowes independend scaling of the resource demanding task.
 

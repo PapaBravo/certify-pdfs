@@ -1,40 +1,12 @@
 # Introduction
 
-![Box View L1 Whitebox](doc/box-view-L1-whitebox.drawio.png "L1 Whitebox")
-![Box View L2 Renderer](doc/box-view-L2-renderer.drawio.png "L2 Renderer")
-![Deployment](doc/deployment.drawio.png "Deployment")
-![Runtime Signing](doc/runtime-signing.png "Runtime Signing")
+For architecture, see [architecture documentation](doc/architecture.adoc)
 
-## Redis
+# Running
 
-### Data Model
-
-* `queue` is a Redis `list` of uuids (strings)
-* `jobs:<uuid>` is a hashset containing the following keys
-
-|     key     |              type               |
-| ----------- | ------------------------------- |
-| date        | string (iso8601)                |
-| status      | string (WAITING,RENDERING,DONE) |
-| documentKey | string                          |
-| claim       | string (json)                   |
-| pdfUrl      | string                          |
-# Testing
-After startup, run
-```sh
-cd deployment
-helm test certify-pdfs --logs
-```
-
-# Start up
-Using docker-compose, the whole system can be started with 
-
-```sh
-sh ./start.sh
-```
+The system can be tested with [docker-compose](https://docs.docker.com/compose/) or  deployed to a kubernetes cluster (tested with [microk8s](https://microk8s.io/)). See below.
 
 ## Before Startup
-### Crypto
 Generate a new key pair with 
 
 ```sh
@@ -45,20 +17,25 @@ cat ./deployment/certify-pdfs/secrets/ec256-public.pem | base64 -w 0 > ./deploym
 ```
 and add the base64 parts to the `deployments/.env`.
 
+## Start with docker-compose
+Using docker-compose, the whole system can be started with 
 
-# Kubernetes / Helm
+```sh
+sh ./start.sh
+```
+
+## Kubernetes / Helm
 
 ```sh
 # run once to install dependencies
 cd deployment/
 helm dependency update ./certify-pdfs
-```
 
-```sh
-# deploy locally
-cd deployment/
+# deploy locally (repeat after changing code)
 sh deploy.sh
 ```
+
+### Inspect and manually test
 
 ```sh
 # Dashboard
@@ -79,7 +56,7 @@ microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep certify
 microk8s kubectl port-forward $(microk8s kubectl get pods -o=name | grep cI think I ertify-pdfs-client ) 8084:80
 ```
 
-## Testing
+## Automated Testing
 ```sh
 cd deployment/
 helm test certify-pdfs --logs

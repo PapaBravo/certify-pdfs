@@ -1,0 +1,117 @@
+openapi: '3.0.3'
+info:
+  title: Certify PDFs
+  version: '1.0'
+servers:
+  - url: http://localhost:8080/api/v1
+paths:
+  /sign:
+    post:
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              properties:
+                claim: 
+                  type: string
+                documentKey:
+                  type: string
+              example:
+                claim: "{\"firstName\": \"First\", \"lastName\": \"Last\"}"
+                documentKey: ticket
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                properties:
+                  jobID: 
+                    type: string
+                    format: uuid
+  /job/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+          '200':
+            description: OK
+            content:
+              'application/json':
+                schema:
+                  $ref: '#/components/schemas/Job'
+  /verify:
+    post:
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              properties:
+                signature:
+                  type: string
+                  format: JWS
+                  description: A JWS in compact serialization format
+      responses:
+          '200':
+            description: OK
+            content:
+              'application/json':
+                schema:
+                  type: object
+                  description: The claim in deserialized form.
+          '400':
+            description: Failed to verify
+  /public-key:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+              'application/json':
+                schema:
+                  $ref: '#/components/schemas/JWK' 
+components:
+  schemas:
+    Job:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        documentKey:
+          type: string
+        claim:
+          type: string
+        pdfUrl:
+          type: string
+          format: url
+    JobStatus:
+      type: string
+      enum: [WAITING, RENDERING, DONE]
+    JWK:
+      description: A JSON Web Key, see https://www.rfc-editor.org/rfc/rfc7517
+      type: object
+      properties:
+        kty:
+          type: string
+          enum: [EC]
+        kid:
+          type: string
+          description: The key used for signing. (Currently fixed)
+        crv:
+          type: string
+          enum: [P-256]
+        x:
+          type: string
+          description: Parameter of (i.e. coordinate on) curve.
+        y:
+          type: string
+          description: Parameter of (i.e. coordinate on) curve.
+      

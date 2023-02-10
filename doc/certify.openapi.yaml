@@ -1,4 +1,4 @@
-openapi: '3.1.0'
+openapi: '3.0.3'
 info:
   title: Certify PDFs
   version: '1.0'
@@ -32,10 +32,11 @@ paths:
   /job/{id}:
     get:
       parameters:
-        - in: paths
+        - in: path
           name: id
-          type: string
-          format: uuid
+          schema:
+            type: string
+            format: uuid
           required: true
       responses:
           '200':
@@ -43,17 +44,18 @@ paths:
             content:
               'application/json':
                 schema:
-                  $ref: '#/definitions/Job'
+                  $ref: '#/components/schemas/Job'
   /verify:
     post:
       requestBody:
         content:
           'application/json':
             schema:
-              signature:
-                type: string
-                format: JWS
-                description: A JWS in compact serialization format
+              properties:
+                signature:
+                  type: string
+                  format: JWS
+                  description: A JWS in compact serialization format
       responses:
           '200':
             description: OK
@@ -72,44 +74,44 @@ paths:
           content:
               'application/json':
                 schema:
-                  $ref: '#/definitions/JWK' 
-
-definitions:
-  Job:
-    type: object
-    properties:
-      date:
-        type: string
-        format: date-time
-      status:
-        $ref: '#/definitions/JobStatus'
-      documentKey:
-        type: string
-      claim:
-        type: string
-      pdfUrl:
-        type: string
-        format: url
-  JobStatus:
-    type: string
-    enum: [WAITING, RENDERING, DONE]
-  JWK:
-    description: A JSON Web Key, see https://www.rfc-editor.org/rfc/rfc7517
-    type: object
-    properties:
-      kty:
-        type: string
-        enum: [EC]
-      kid:
-        type: string
-        description: The key used for signing. (Currently fixed)
-      crv:
-        type: string
-        enum: [P-256]
-      x:
-        type: string
-        description: Parameter of (i.e. coordinate on) curve.
-      y:
-        type: string
-        description: Parameter of (i.e. coordinate on) curve.
+                  $ref: '#/components/schemas/JWK' 
+components:
+  schemas:
+    Job:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        documentKey:
+          type: string
+        claim:
+          type: string
+        pdfUrl:
+          type: string
+          format: url
+    JobStatus:
+      type: string
+      enum: [WAITING, RENDERING, DONE]
+    JWK:
+      description: A JSON Web Key, see https://www.rfc-editor.org/rfc/rfc7517
+      type: object
+      properties:
+        kty:
+          type: string
+          enum: [EC]
+        kid:
+          type: string
+          description: The key used for signing. (Currently fixed)
+        crv:
+          type: string
+          enum: [P-256]
+        x:
+          type: string
+          description: Parameter of (i.e. coordinate on) curve.
+        y:
+          type: string
+          description: Parameter of (i.e. coordinate on) curve.
       

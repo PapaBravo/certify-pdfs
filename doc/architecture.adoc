@@ -50,7 +50,8 @@ image:business-case.drawio.png[Business Case]
 image:business-context.drawio.png[Business Context]
 
 === Technical Context
-The api description can be found in the link:/doc/certify.openapi.yaml[repository] and can be rendered with the https://editor.swagger.io/[swagger editor].
+
+The api description can be found in the link:/doc/certify.openapi.yaml[repository] and can be rendered with the https://editor.swagger.io/?spec=https://raw.githubusercontent.com/PapaBravo/certify-pdfs/main/doc/certify.openapi.yaml[swagger editor] (! always linking to the main branch and not the current branch).
 
 == Solution Strategy
 The system uses the https://redis.io/docs/manual/pubsub/[redis pubsup] mechanism as a simple work queue. That way the technologically complex rendering process is isolated and can be changed later. It also allowes independend scaling of the resource demanding task.
